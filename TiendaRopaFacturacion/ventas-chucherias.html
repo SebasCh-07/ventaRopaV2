@@ -141,20 +141,32 @@
                     </svg>
                 </button>
             </div>
-            <form id="add-sale-form">
-                <div class="modal-body">
+            <div class="modal-body">
+                <div class="form-row">
                     <div class="form-group">
-                        <label for="sale-client">Seleccionar Cliente *</label>
-                        <select id="sale-client" name="client" required>
-                            <option value="">Seleccionar cliente</option>
-                        </select>
+                        <label for="client-search-input">Buscar cliente por nombre o cédula</label>
+                        <input type="text" id="client-search-input" placeholder="Ej: María o 1234567890">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="ventasChucheriasManager.closeModal('add-sale-modal')">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Continuar</button>
+                <div class="table-wrapper" style="max-height:300px;overflow:auto;border:1px solid #e9ecef;border-radius:8px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-list-body">
+                            <!-- clientes -->
+                        </tbody>
+                    </table>
                 </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="ventasChucheriasManager.closeModal('add-sale-modal')">Cerrar</button>
+            </div>
         </div>
     </div>
 
@@ -182,6 +194,23 @@
                     <div id="products-container" class="products-grid">
                         <p class="text-muted">Seleccione una categoría para ver los productos</p>
                     </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="articulos-modal-footer" style="display: none; justify-content: flex-end;">
+                <div class="modal-actions" style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" id="cancel-articulos-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="continue-articulos-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9,18 15,12 9,6"></polyline>
+                        </svg>
+                        Continuar
+                    </button>
                 </div>
             </div>
         </div>

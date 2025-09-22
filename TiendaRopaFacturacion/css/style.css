@@ -1,3 +1,11 @@
+.articulos-modal {
+    justify-content: center !important; /* centrar solo este modal */
+}
+
+.articulos-modal .modal-content {
+    margin: 0;
+    border-radius: var(--border-radius-lg);
+}
 /* ===== RESET Y ESTILOS BASE ===== */
 * {
     margin: 0;
@@ -1282,10 +1290,19 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center;       /* centrado vertical */
+    justify-content: center;   /* centrado horizontal */
     z-index: 2000;
     padding: 1rem;
+}
+
+.modal .modal-content {
+    margin: 0;
+}
+
+/* Evitar scroll del fondo cuando el modal está abierto */
+body.modal-open {
+    overflow: hidden;
 }
 
 .modal-content {
@@ -2458,10 +2475,11 @@ body {
     color: var(--success-color);
 }
 
-/* Modal de artículos */
-.modal.large {
-    max-width: 90vw;
-    width: 1000px;
+/* Modal de artículos - tamaños específicos SOLO para el modal de artículos */
+.modal.large .modal-content {
+    width: 100%;
+    max-width: 1000px;      /* ancho máximo deseado */
+    max-height: 90vh;       /* alto máximo visible */
 }
 
 .categories-section {

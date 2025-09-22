@@ -60,10 +60,23 @@ class VentasChucheriasManager {
             addItemBtn.addEventListener('click', () => this.showArticulosModal());
         }
 
-        // Formulario de nueva venta
-        const addSaleForm = document.getElementById('add-sale-form');
-        if (addSaleForm) {
-            addSaleForm.addEventListener('submit', (e) => this.handleAddSale(e));
+
+        // Botón continuar en modal de artículos
+        const continueBtn = document.getElementById('continue-articulos-btn');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => this.continueFromArticulos());
+        }
+
+        // Botón cancelar en modal de artículos
+        const cancelBtn = document.getElementById('cancel-articulos-btn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => this.cancelFromArticulos());
+        }
+
+        // Campo de búsqueda de clientes
+        const clientSearchInput = document.getElementById('client-search-input');
+        if (clientSearchInput) {
+            clientSearchInput.addEventListener('input', () => this.renderClientsInModal());
         }
 
         // Cerrar modales
@@ -87,52 +100,54 @@ class VentasChucheriasManager {
     showAddSaleModal() {
         const modal = document.getElementById('add-sale-modal');
         if (modal) {
-            // Limpiar formulario
-            const form = modal.querySelector('form');
-            if (form) form.reset();
+            // Limpiar campo de búsqueda
+            const searchInput = document.getElementById('client-search-input');
+            if (searchInput) searchInput.value = '';
             
-            // Cargar clientes en el select
-            this.loadClientsInSelect();
+            // Renderizar clientes en la tabla
+            this.renderClientsInModal();
             
             modal.style.display = 'flex';
         }
     }
 
-    loadClientsInSelect() {
-        const clientSelect = document.getElementById('sale-client');
-        if (!clientSelect) return;
+    renderClientsInModal() {
+        const tbody = document.getElementById('client-list-body');
+        if (!tbody) return;
+        const searchInput = document.getElementById('client-search-input');
+        const query = (searchInput?.value || '').toLowerCase().trim();
 
-        clientSelect.innerHTML = '<option value="">Seleccionar cliente</option>';
-        this.clients.forEach(client => {
-            const option = document.createElement('option');
-            option.value = client.cedula;
-            option.textContent = `${client.nombre} - ${client.ciudad}`;
-            clientSelect.appendChild(option);
+        let list = [...this.clients];
+        if (query) {
+            list = list.filter(c => c.nombre.toLowerCase().includes(query) || String(c.cedula).includes(query));
+        }
+
+        tbody.innerHTML = '';
+        list.forEach(client => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${this.escapeHtml(client.nombre)}</td>
+                <td>${this.escapeHtml(String(client.cedula))}</td>
+                <td>${this.escapeHtml(client.telefono || '-')}</td>
+                <td><button type="button" class="btn btn-sm btn-primary">Seleccionar</button></td>
+            `;
+            tr.querySelector('button').onclick = () => this.selectClientFromList(client.cedula);
+            tbody.appendChild(tr);
         });
     }
 
-    handleAddSale(event) {
-        event.preventDefault();
-        
-        const formData = new FormData(event.target);
-        const clientCedula = parseInt(formData.get('client'));
-        
-        if (!clientCedula) {
-            this.showNotification('Debe seleccionar un cliente', 'error');
-            return;
-        }
-
-        const client = this.clients.find(c => c.cedula === clientCedula);
+    selectClientFromList(cedula) {
+        const client = this.clients.find(c => c.cedula === cedula);
         if (!client) {
             this.showNotification('Cliente no encontrado', 'error');
             return;
         }
-
         this.currentSale.cliente = client;
         this.closeModal('add-sale-modal');
         this.updateDisplay();
         this.showNotification('Cliente seleccionado. Ahora puede agregar artículos.', 'success');
     }
+
 
     showArticulosModal() {
         if (!this.currentSale.cliente) {
@@ -142,6 +157,8 @@ class VentasChucheriasManager {
 
         const modal = document.getElementById('articulos-modal');
         if (modal) {
+            // Ocultar botón continuar al abrir el modal
+            this.hideContinueButton();
             this.renderCategories();
             modal.style.display = 'flex';
         }
@@ -157,6 +174,7 @@ class VentasChucheriasManager {
             const categoryBtn = document.createElement('button');
             categoryBtn.className = `category-btn ${this.currentCategory === category.id ? 'active' : ''}`;
             categoryBtn.textContent = category.name;
+            categoryBtn.setAttribute('data-category-id', category.id);
             categoryBtn.onclick = () => this.toggleCategoria(category.id);
             categoriesContainer.appendChild(categoryBtn);
         });
@@ -171,7 +189,8 @@ class VentasChucheriasManager {
     updateCategoryButtons() {
         const categoryBtns = document.querySelectorAll('.category-btn');
         categoryBtns.forEach(btn => {
-            const categoryId = parseInt(btn.textContent);
+            // Obtener el ID de la categoría desde el data attribute
+            const categoryId = parseInt(btn.getAttribute('data-category-id'));
             btn.classList.toggle('active', this.currentCategory === categoryId);
         });
     }
@@ -237,6 +256,9 @@ class VentasChucheriasManager {
         this.calculateTotal();
         this.updateDisplay();
         this.showNotification(`${product.nombre} agregado a la venta`, 'success');
+        
+        // Mostrar botón continuar
+        this.showContinueButton();
     }
 
     calculateTotal() {
@@ -310,6 +332,7 @@ class VentasChucheriasManager {
         this.updateClientDisplay();
         this.updateItemsDisplay();
         this.updateTotalDisplay();
+        this.updateButtonsState();
     }
 
     updateClientDisplay() {
@@ -358,6 +381,45 @@ class VentasChucheriasManager {
         if (totalDisplay) {
             totalDisplay.textContent = `$${this.currentSale.total.toFixed(2)}`;
         }
+    }
+
+    updateButtonsState() {
+        const addItemBtn = document.getElementById('add-item-btn');
+        const finalizeBtn = document.getElementById('finalize-sale-btn');
+        
+        // Habilitar "Agregar Artículo" si hay un cliente seleccionado
+        if (addItemBtn) {
+            addItemBtn.disabled = !this.currentSale.cliente;
+        }
+        
+        // Habilitar "Finalizar Venta" si hay un cliente y al menos un artículo
+        if (finalizeBtn) {
+            finalizeBtn.disabled = !this.currentSale.cliente || this.currentSale.articulos.length === 0;
+        }
+    }
+
+    showContinueButton() {
+        const footer = document.getElementById('articulos-modal-footer');
+        if (footer) {
+            footer.style.display = 'block';
+        }
+    }
+
+    hideContinueButton() {
+        const footer = document.getElementById('articulos-modal-footer');
+        if (footer) {
+            footer.style.display = 'none';
+        }
+    }
+
+    continueFromArticulos() {
+        this.closeModal('articulos-modal');
+        this.showNotification('Artículos agregados. Puede continuar agregando más o finalizar la venta.', 'success');
+    }
+
+    cancelFromArticulos() {
+        this.closeModal('articulos-modal');
+        this.showNotification('Operación cancelada.', 'info');
     }
 
     renderSales() {
@@ -549,6 +611,11 @@ class VentasChucheriasManager {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
+            
+            // Ocultar botón continuar al cerrar modal de artículos
+            if (modalId === 'articulos-modal') {
+                this.hideContinueButton();
+            }
         }
     }
 

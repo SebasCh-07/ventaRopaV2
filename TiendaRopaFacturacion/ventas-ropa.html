@@ -143,23 +143,37 @@
             </div>
             <form id="add-sale-form">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="sale-client">Seleccionar Cliente *</label>
-                        <select id="sale-client" name="client" required>
-                            <option value="">Seleccionar cliente</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-search-input">Buscar cliente por nombre o cédula</label>
+                            <input type="text" id="client-search-input" placeholder="Ej: María o 1234567890">
+                        </div>
+                    </div>
+                    <div class="table-wrapper" style="max-height:300px;overflow:auto;border:1px solid #e9ecef;border-radius:8px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cédula</th>
+                                    <th>Teléfono</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="client-list-body">
+                                <!-- clientes -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="ventasRopaManager.closeModal('add-sale-modal')">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Continuar</button>
+                    <button type="button" class="btn btn-secondary" onclick="ventasRopaManager.closeModal('add-sale-modal')">Cerrar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Articles Modal -->
-    <div id="articulos-modal" class="modal large" style="display: none;">
+    <div id="articulos-modal" class="modal large articulos-modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Seleccionar Artículos de Ropa</h3>
@@ -183,6 +197,10 @@
                         <p class="text-muted">Seleccione una categoría para ver los productos</p>
                     </div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="ventasRopaManager.closeModal('articulos-modal')">Cancelar</button>
+                <button type="button" id="continue-articles-btn" class="btn btn-primary" disabled>Continuar</button>
             </div>
         </div>
     </div>

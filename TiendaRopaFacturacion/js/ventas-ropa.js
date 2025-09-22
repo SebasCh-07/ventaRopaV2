@@ -60,10 +60,10 @@ class VentasRopaManager {
             addItemBtn.addEventListener('click', () => this.showArticulosModal());
         }
 
-        // Formulario de nueva venta
+        // Formulario de nueva venta: evitar submit por Enter
         const addSaleForm = document.getElementById('add-sale-form');
         if (addSaleForm) {
-            addSaleForm.addEventListener('submit', (e) => this.handleAddSale(e));
+            addSaleForm.addEventListener('submit', (e) => e.preventDefault());
         }
 
         // Cerrar modales
@@ -91,24 +91,64 @@ class VentasRopaManager {
             const form = modal.querySelector('form');
             if (form) form.reset();
             
-            // Cargar clientes en el select
-            this.loadClientsInSelect();
+            // Renderizar lista de clientes en el modal
+            this.renderClientsInModal();
+            this.setupClientModalFilters();
             
             modal.style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
     }
 
-    loadClientsInSelect() {
-        const clientSelect = document.getElementById('sale-client');
-        if (!clientSelect) return;
+    setupClientModalFilters() {
+        const searchInput = document.getElementById('client-search-input');
+        if (searchInput) {
+            searchInput.oninput = () => this.renderClientsInModal();
+        }
+    }
 
-        clientSelect.innerHTML = '<option value="">Seleccionar cliente</option>';
-        this.clients.forEach(client => {
-            const option = document.createElement('option');
-            option.value = client.cedula;
-            option.textContent = `${client.nombre} - ${client.ciudad}`;
-            clientSelect.appendChild(option);
+    renderClientsInModal() {
+        const tbody = document.getElementById('client-list-body');
+        if (!tbody) return;
+        const searchInput = document.getElementById('client-search-input');
+        const query = (searchInput?.value || '').toLowerCase().trim();
+
+        let list = [...this.clients];
+        if (query) {
+            list = list.filter(c => c.nombre.toLowerCase().includes(query) || String(c.cedula).includes(query));
+        }
+
+        tbody.innerHTML = '';
+        if (list.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="5" class="text-center text-muted">No se encontraron clientes</td>`;
+            tbody.appendChild(tr);
+            return;
+        }
+
+        list.forEach(client => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${this.escapeHtml(client.nombre)}</td>
+                <td>${this.escapeHtml(String(client.cedula))}</td>
+                <td>${this.escapeHtml(client.telefono || '-')}</td>
+                <td><button type="button" class="btn btn-sm btn-primary">Seleccionar</button></td>
+            `;
+            tr.querySelector('button').onclick = () => this.selectClientFromList(client.cedula);
+            tbody.appendChild(tr);
         });
+    }
+
+    selectClientFromList(cedula) {
+        const client = this.clients.find(c => c.cedula === cedula);
+        if (!client) {
+            this.showNotification('Cliente no encontrado', 'error');
+            return;
+        }
+        this.currentSale.cliente = client;
+        this.closeModal('add-sale-modal');
+        this.updateDisplay();
+        this.showNotification('Cliente seleccionado. Ahora puede agregar artículos.', 'success');
     }
 
     handleAddSale(event) {
@@ -143,7 +183,16 @@ class VentasRopaManager {
         const modal = document.getElementById('articulos-modal');
         if (modal) {
             this.renderCategories();
+            const continueBtn = document.getElementById('continue-articles-btn');
+            if (continueBtn) {
+                continueBtn.disabled = this.currentSale.articulos.length === 0;
+                continueBtn.onclick = () => {
+                    this.closeModal('articulos-modal');
+                    this.updateDisplay();
+                };
+            }
             modal.style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
     }
 
@@ -237,6 +286,9 @@ class VentasRopaManager {
         this.calculateTotal();
         this.updateDisplay();
         this.showNotification(`${product.nombre} agregado a la venta`, 'success');
+
+        const continueBtn = document.getElementById('continue-articles-btn');
+        if (continueBtn) continueBtn.disabled = this.currentSale.articulos.length === 0;
     }
 
     calculateTotal() {
@@ -561,6 +613,7 @@ class VentasRopaManager {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
     }
 
