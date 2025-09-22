@@ -45,7 +45,6 @@ TiendaRopaFacturacion/
 ├── ventas-ropa.html              # Ventas de ropa
 ├── ventas-chucherias.html        # Ventas de chucherías
 ├── facturacion.html              # Sistema de facturación
-├── test-database.html            # Página de pruebas
 │
 ├── css/
 │   └── style.css                 # Estilos principales (2700+ líneas)
