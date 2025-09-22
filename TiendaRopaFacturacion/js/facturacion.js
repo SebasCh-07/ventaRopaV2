@@ -431,7 +431,7 @@ class FacturacionManager {
                 </div>
 
                 <div class="sale-footer">
-                    <button class="btn btn-sm btn-secondary">Factura</button>
+                    <button class="btn btn-sm btn-secondary" onclick="facturacionManager.openInvoicePage(${sale.id})">Factura</button>
                 </div>
             </div>
         `;
@@ -891,11 +891,24 @@ class FacturacionManager {
     }
 
     getDateKey(date) {
-        const d = new Date(date);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
+        // Usar UTC para evitar desfases por zona horaria
+        try {
+            return new Date(date).toISOString().slice(0, 10); // YYYY-MM-DD
+        } catch (e) {
+            const d = new Date(date);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+    }
+
+    openInvoicePage(saleId) {
+        const sale = this.sales.find(s => s.id === saleId);
+        if (!sale) return;
+        const clientId = sale.client ? (sale.client.cedula ?? sale.client.id) : sale.clientId;
+        const dateKey = this.getDateKey(sale.date);
+        window.location.href = `invoice.html?client=${encodeURIComponent(clientId)}&date=${encodeURIComponent(dateKey)}`;
     }
 }
 

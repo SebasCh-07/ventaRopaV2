@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura</title>
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        :root {
+            --primary: #111;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --bg-banner: #eee7da;
+            --accent: #111;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background:#f5f6f8; color:#111; }
+        .page { max-width: 900px; margin: 24px auto; background:#fff; border:1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,.05); border-radius: 10px; overflow: hidden; }
+        .banner { background: var(--bg-banner); padding: 20px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+        .banner h1 { margin:0; font-size:36px; letter-spacing:2px; }
+        .number-box { border:2px solid #cfc7b6; padding:6px 14px; border-radius:6px; font-weight:700; background:#fff; }
+        .topline { display:flex; align-items:center; justify-content:space-between; padding: 16px 24px; }
+        .brand img { width:64px; height:64px; object-fit:cover; border-radius:6px; }
+        .meta { text-align:right; color: var(--muted); font-size: 14px; }
+        .section { padding: 0 24px 24px; }
+        .info-row { display:grid; grid-template-columns: 1fr 1fr; gap:24px; position: relative; padding: 20px 0; }
+        .info-row::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background: var(--border); }
+        .info-block h4 { margin:0 0 8px 0; font-size:12px; color:#555; font-weight:700; text-transform: uppercase; }
+        .muted { color: var(--muted); }
+        table { width:100%; border-collapse: collapse; }
+        thead th { text-align:left; background:#f3f4f6; padding:12px; border:1px solid var(--border); font-size:13px; color:#555; }
+        tbody td { padding:12px; border-left:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border); font-size:14px; }
+        tfoot td { padding:12px; font-weight:700; font-size:15px; border-left:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+        .right { text-align:right; }
+        .total-row { margin-top: 24px; display:flex; justify-content:flex-end; }
+        .total-box { border:2px solid #cfc7b6; padding:8px 16px; border-radius:6px; min-width:220px; display:flex; justify-content:space-between; font-weight:700; }
+        .actions { display:flex; justify-content:flex-end; gap:8px; padding:16px 24px 24px; }
+        .btn { border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+        .btn-primary { background: #667eea; color:#fff; }
+        .btn-outline { background:#fff; border:1px solid var(--border); }
+        @media print { .actions { display:none; } .page { box-shadow:none; border:0; margin:0; border-radius:0; } body{ background:#fff;} }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="banner">
+            <h1>FACTURA</h1>
+            <div class="brand"><img src="img/logo.jpg" alt="Logo"></div>
+        </div>
+        <div class="topline">
+            <div class="number-box" id="invoice-number">N°: -</div>
+            <div class="meta">
+                <div id="invoice-date">Fecha: -</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="info-row">
+                <div class="info-block">
+                    <h4>Datos del Cliente</h4>
+                    <div id="client-name">-</div>
+                    <div class="muted" id="client-city">-</div>
+                    <div class="muted" id="client-phone">-</div>
+                </div>
+                <div class="info-block" style="text-align:right;">
+                    <h4>Datos de la Empresa</h4>
+                    <div>De Moda Con Vivi</div>
+                    <div class="muted">deModaconVivi@gmail.com</div>
+                    <div class="muted">091-234-5678</div>
+                    <div class="muted">Calle Cualquiera 123, Cualquier Lugar</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Artículo</th>
+                        <th class="right">Cantidad</th>
+                        <th class="right">Precio</th>
+                        <th class="right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-lines"></tbody>
+            </table>
+            <div class="total-row">
+                <div class="total-box">
+                    <div>TOTAL</div>
+                    <div id="invoice-total">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-outline" onclick="window.history.back()">Volver</button>
+            <button class="btn btn-primary" onclick="window.print()">Imprimir</button>
+        </div>
+    </div>
+
+    <script src="js/database.js?v=4"></script>
+    <script src="js/invoice.js?v=1"></script>
+</body>
+</html>
+
+
