@@ -1645,20 +1645,35 @@ body.modal-open {
 .sales-list {
     display: flex;
     flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 .sale-card {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--gray-200);
+    padding: 1.25rem 1.25rem 1rem 1.25rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
     transition: var(--transition);
+    position: relative;
 }
 
 .sale-card:hover {
     background: var(--gray-50);
+    box-shadow: var(--shadow);
 }
 
-.sale-card:last-child {
-    border-bottom: none;
+.sale-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    border-top-left-radius: var(--border-radius-lg);
+    border-bottom-left-radius: var(--border-radius-lg);
 }
 
 .sale-header {
@@ -1695,12 +1710,94 @@ body.modal-open {
 .sale-item {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--gray-100);
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+}
+
+.sale-item + .sale-item {
+    margin-top: 0.5rem;
 }
 
 .sale-item:last-child {
     border-bottom: none;
+}
+
+.sale-item-more {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    background: var(--gray-50);
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--border-radius);
+}
+
+/* Nuevo layout basado en el modelo */
+.sale-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gray-200);
+    font-weight: 600;
+}
+
+.sale-card-header .left {
+    color: var(--primary-color);
+}
+
+.sale-type-badge {
+    background: var(--gray-800);
+    color: var(--white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.sale-card-header .center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.sale-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+}
+
+.sale-grid .cell {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    background: var(--gray-50);
+    padding: 0.5rem 0.75rem;
+}
+
+.cell-label {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    margin-bottom: 0.25rem;
+}
+
+.cell-value {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.sale-footer {
+    margin-top: 0.75rem;
+}
+
+.ml-1 { margin-left: 0.5rem; }
+
+@media (max-width: 768px) {
+    .sale-grid { grid-template-columns: 1fr 1fr; }
 }
 
 .sale-total {

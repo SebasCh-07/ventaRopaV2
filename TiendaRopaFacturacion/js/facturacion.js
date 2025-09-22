@@ -83,35 +83,69 @@ class FacturacionManager {
             // Convertir a formato de facturación
             this.sales = [];
             
-            // Procesar ventas de ropa
+            // Procesar ventas de ropa (unificar estructura de cliente y normalizar campos)
             ropaSales.forEach(venta => {
+                const cliente = venta.cliente ? {
+                    id: venta.cliente.cedula, // mantener compatibilidad
+                    cedula: venta.cliente.cedula,
+                    name: venta.cliente.nombre,
+                    nombre: venta.cliente.nombre,
+                    city: venta.cliente.ciudad,
+                    ciudad: venta.cliente.ciudad,
+                    phone: venta.cliente.telefono,
+                    telefono: venta.cliente.telefono,
+                    address: venta.cliente.direccion,
+                    direccion: venta.cliente.direccion
+                } : null;
+
+                const quantity = Number(venta.cantidad || 1);
+                const price = Number(venta.producto?.precio || 0);
+                const itemSubtotal = price * quantity;
+
                 this.sales.push({
                     id: venta.id,
                     funda: venta.factura?.funda || 0,
-                    client: venta.cliente,
+                    client: cliente,
                     items: [{
                         description: venta.producto?.nombre || 'Producto no encontrado',
-                        category: 'Ropa',
-                        price: venta.producto?.precio || 0
+                        quantity: quantity,
+                        subtotal: itemSubtotal
                     }],
-                    total: venta.producto?.precio || 0,
+                    total: itemSubtotal,
                     date: venta.fecha,
                     tipo: 'ropa'
                 });
             });
             
-            // Procesar ventas de chucherías
+            // Procesar ventas de chucherías (unificar estructura de cliente y normalizar campos)
             chucheriasSales.forEach(venta => {
+                const cliente = venta.cliente ? {
+                    id: venta.cliente.cedula,
+                    cedula: venta.cliente.cedula,
+                    name: venta.cliente.nombre,
+                    nombre: venta.cliente.nombre,
+                    city: venta.cliente.ciudad,
+                    ciudad: venta.cliente.ciudad,
+                    phone: venta.cliente.telefono,
+                    telefono: venta.cliente.telefono,
+                    address: venta.cliente.direccion,
+                    direccion: venta.cliente.direccion
+                } : null;
+
+                const quantity = Number(venta.cantidad || 1);
+                const price = Number(venta.producto?.precio || 0);
+                const itemSubtotal = price * quantity;
+
                 this.sales.push({
                     id: venta.id + 1000, // Offset para evitar conflictos de ID
                     funda: venta.factura?.funda || 0,
-                    client: venta.cliente,
+                    client: cliente,
                     items: [{
                         description: venta.producto?.nombre || 'Producto no encontrado',
-                        category: 'Chucherías',
-                        price: venta.producto?.precio || 0
+                        quantity: quantity,
+                        subtotal: itemSubtotal
                     }],
-                    total: venta.producto?.precio || 0,
+                    total: itemSubtotal,
                     date: venta.fecha,
                     tipo: 'chucherias'
                 });
@@ -186,8 +220,8 @@ class FacturacionManager {
 
         // Obtener clientes que tienen ventas de forma segura
         const clientsWithSales = [...new Set(this.sales.map(sale => {
-            if (sale.client && sale.client.id) {
-                return sale.client.id;
+            if (sale.client && (sale.client.cedula || sale.client.id)) {
+                return sale.client.cedula ?? sale.client.id;
             } else if (sale.clientId) {
                 return sale.clientId;
             }
@@ -195,15 +229,15 @@ class FacturacionManager {
         }).filter(id => id !== null))];
         
         const activeClients = this.clients.filter(client => 
-            clientsWithSales.includes(client.id)
-        ).sort((a, b) => a.name.localeCompare(b.name));
+            clientsWithSales.includes(client.cedula)
+        ).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
         clientFilter.innerHTML = '<option value="">Todos los clientes</option>';
         
         activeClients.forEach(client => {
             const option = document.createElement('option');
-            option.value = client.id;
-            option.textContent = `${client.name} - ${client.city}`;
+            option.value = client.cedula;
+            option.textContent = `${client.nombre} - ${client.ciudad}`;
             clientFilter.appendChild(option);
         });
 
@@ -246,7 +280,7 @@ class FacturacionManager {
 
             // Filtro por cliente
             if (this.filters.client) {
-                const saleClientId = sale.client ? sale.client.id : sale.clientId;
+                const saleClientId = sale.client ? (sale.client.cedula ?? sale.client.id) : sale.clientId;
                 if (saleClientId != this.filters.client) {
                     return false;
                 }
@@ -302,12 +336,43 @@ class FacturacionManager {
             return;
         }
 
-        // Ordenar por fecha descendente
-        const sortedSales = [...this.filteredSales].sort((a, b) => 
-            new Date(b.date) - new Date(a.date)
-        );
+        // Agrupar por cliente y día para evitar duplicados en la lista
+        const groups = new Map();
+        for (const sale of this.filteredSales) {
+            const clientId = sale.client ? (sale.client.cedula ?? sale.client.id) : sale.clientId;
+            const key = `${clientId}|${this.getDateKey(sale.date)}`;
+            if (!groups.has(key)) {
+                groups.set(key, {
+                    representative: sale,
+                    items: [],
+                    total: 0,
+                    tipos: new Set()
+                });
+            }
+            const group = groups.get(key);
+            group.items.push(...(sale.items || sale.articulos || []));
+            group.total += Number(sale.total || 0);
+            if (sale.tipo) group.tipos.add(sale.tipo);
+        }
 
-        container.innerHTML = sortedSales.map(sale => this.renderSaleCard(sale)).join('');
+        // Preparar ventas a mostrar: una por grupo
+        const groupedSales = Array.from(groups.values()).map(g => {
+            const firstItem = g.items[0] || { description: 'Artículo', quantity: 1, subtotal: 0 };
+            // Determinar tipo del grupo (si hay mezcla, por simplicidad dejamos ROPA)
+            const tipoGrupo = (g.tipos.size === 1 && g.tipos.has('chucherias')) ? 'chucherias' : 'ropa';
+            return {
+                ...g.representative,
+                // Mostrar solo el primer artículo como referencia en la lista
+                items: [firstItem],
+                total: g.total,
+                tipo: tipoGrupo
+            };
+        });
+
+        // Ordenar por fecha descendente usando la venta representante
+        groupedSales.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        container.innerHTML = groupedSales.map(sale => this.renderSaleCard(sale)).join('');
     }
 
     renderSaleCard(sale) {
@@ -320,66 +385,63 @@ class FacturacionManager {
 
         // Obtener artículos (puede ser items o articulos)
         const items = sale.items || sale.articulos || [];
-        const clientName = sale.client ? sale.client.name : 'Cliente no encontrado';
-        const clientCity = sale.client ? sale.client.city : '';
+        const clientName = sale.client ? (sale.client.nombre || sale.client.name) : 'Cliente no encontrado';
+        const clientCity = sale.client ? (sale.client.ciudad || sale.client.city || '') : '';
+        const clientCode = sale.client ? this.getClientCode(sale.client) : '';
 
-        const itemsSummary = items.length === 1 
-            ? (items[0].description || items[0].nombre || 'Artículo')
-            : `${items.length} artículos`;
+        const firstItemName = items.length > 0 ? (items[0].description || items[0].nombre || 'Artículo') : 'Artículo';
+        const firstItemQty = items.length > 0 ? (items[0].quantity || 1) : 1;
+        const firstItemSubtotal = items.length > 0 ? (items[0].subtotal || 0) : 0;
+
+        const tipoText = (sale.tipo === 'chucherias') ? 'CHUCHERIAS' : 'ROPA';
 
         return `
             <div class="sale-card" data-sale-id="${sale.id}">
-                <div class="sale-header">
-                    <div class="sale-funda">Funda ${sale.funda}</div>
-                    <div class="sale-client">${clientName} - ${clientCity}</div>
+                <div class="sale-card-header">
+                    <div class="left">${clientCode}</div>
+                    <div class="center"><span class="sale-type-badge">${tipoText}</span></div>
+                    <div class="right">${formattedDate} ${formattedTime}</div>
                 </div>
-                <div class="sale-meta-info">
-                    <span>📅 ${formattedDate} ${formattedTime}</span>
-                    <span>📦 ${itemsSummary}</span>
-                    <span>💰 $${(sale.total || 0).toFixed(2)}</span>
+
+                <div class="sale-grid">
+                    <div class="cell">
+                        <div class="cell-label">Nombre</div>
+                        <div class="cell-value">${clientName}</div>
+                    </div>
+                    <div class="cell">
+                        <div class="cell-label">Ciudad</div>
+                        <div class="cell-value">${clientCity}</div>
+                    </div>
+                    <div class="cell">
+                        <div class="cell-label">Artículo</div>
+                        <div class="cell-value"><button class="btn btn-sm btn-primary" onclick="facturacionManager.viewSaleDetail(${sale.id})">Ver</button></div>
+                    </div>
+                    <div class="cell">
+                        <div class="cell-label">Cantidad</div>
+                        <div class="cell-value">${firstItemQty}</div>
+                    </div>
+                    <div class="cell">
+                        <div class="cell-label">Subtotal</div>
+                        <div class="cell-value">$${firstItemSubtotal.toFixed(2)}</div>
+                    </div>
+                    <div class="cell">
+                        <div class="cell-label">Total</div>
+                        <div class="cell-value">$${(sale.total || 0).toFixed(2)}</div>
+                    </div>
                 </div>
-                <div class="sale-items">
-                    ${items.slice(0, 3).map(item => `
-                        <div class="sale-item">
-                            <span>${this.escapeHtml(item.description || item.nombre || 'Artículo')}</span>
-                            <span>$${(item.price || item.precio || 0).toFixed(2)}</span>
-                        </div>
-                    `).join('')}
-                    ${items.length > 3 ? `
-                        <div class="sale-item-more">
-                            <span>... y ${items.length - 3} artículo${items.length - 3 !== 1 ? 's' : ''} más</span>
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="sale-total">
-                    Total: $${(sale.total || 0).toFixed(2)}
-                </div>
-                <div class="sale-actions">
-                    <button class="btn btn-sm btn-primary" onclick="facturacionManager.viewSaleDetail(${sale.id})" title="Ver detalle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        Ver
-                    </button>
-                    <button class="btn btn-sm btn-secondary" onclick="facturacionManager.printSale(${sale.id})" title="Imprimir">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6,9 6,2 18,2 18,9"></polyline>
-                            <path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"></path>
-                            <polyline points="6,14 18,14 18,18 6,18"></polyline>
-                        </svg>
-                        Imprimir
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="facturacionManager.deleteSale(${sale.id})" title="Eliminar">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3,6 5,6 21,6"></polyline>
-                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
-                        </svg>
-                        Eliminar
-                    </button>
+
+                <div class="sale-footer">
+                    <button class="btn btn-sm btn-secondary">Factura</button>
                 </div>
             </div>
         `;
+    }
+
+    getClientCode(client) {
+        const baseId = client?.cedula ?? client?.id ?? '';
+        const normalized = String(baseId).replace(/\D/g, '');
+        if (!normalized) return '';
+        return `CLI-${normalized.padStart(6, '0')}`;
     }
 
     // ===== ESTADÍSTICAS =====
@@ -443,27 +505,39 @@ class FacturacionManager {
         const sale = this.sales.find(s => s.id === saleId);
         if (!sale) return;
 
-        // Obtener artículos (puede ser items o articulos)
-        const items = sale.items || sale.articulos || [];
-        const clientName = sale.client ? sale.client.name : 'Cliente no encontrado';
-        const clientCity = sale.client ? sale.client.city : '';
-        const clientPhone = sale.client ? sale.client.phone : '';
+        const clientId = sale.client ? (sale.client.cedula ?? sale.client.id) : sale.clientId;
+        const dayKey = this.getDateKey(sale.date);
+
+        // Agrupar todas las ventas del mismo cliente en el mismo día
+        const sameDaySales = this.sales.filter(s => {
+            const sClientId = s.client ? (s.client.cedula ?? s.client.id) : s.clientId;
+            return sClientId == clientId && this.getDateKey(s.date) === dayKey;
+        });
+
+        // Consolidar artículos
+        const items = sameDaySales.flatMap(s => (s.items || s.articulos || []));
+        const total = items.reduce((sum, it) => sum + (Number(it.subtotal) || (Number(it.price || it.precio || 0) * Number(it.quantity || 1))), 0);
+        const uniqueFundas = [...new Set(sameDaySales.map(s => s.funda).filter(f => !!f))];
+
+        const clientName = sale.client ? (sale.client.nombre || sale.client.name) : 'Cliente no encontrado';
+        const clientCity = sale.client ? (sale.client.ciudad || sale.client.city || '') : '';
+        const clientPhone = sale.client ? (sale.client.telefono || sale.client.phone || '') : '';
 
         // Llenar modal de detalle
-        document.getElementById('invoice-funda').textContent = sale.funda;
+        document.getElementById('invoice-funda').textContent = uniqueFundas.length > 1 ? 'MÚLTIPLES' : (uniqueFundas[0] ?? sale.funda);
         document.getElementById('invoice-client-name').textContent = clientName;
         document.getElementById('invoice-client-city').textContent = clientCity;
         document.getElementById('invoice-client-phone').textContent = clientPhone || '-';
-        document.getElementById('invoice-date').textContent = this.formatDateTime(sale.date);
-        document.getElementById('invoice-total').textContent = (sale.total || 0).toFixed(2);
+        document.getElementById('invoice-date').textContent = new Date(sale.date).toLocaleDateString('es-EC');
+        document.getElementById('invoice-total').textContent = total.toFixed(2);
 
-        // Llenar tabla de artículos
+        // Llenar tabla de artículos (Nombre, Cantidad, Subtotal)
         const tbody = document.getElementById('invoice-items-tbody');
         tbody.innerHTML = items.map(item => `
             <tr>
                 <td>${this.escapeHtml(item.description || item.nombre || 'Artículo')}</td>
-                <td>${this.escapeHtml(item.category || 'General')}</td>
-                <td>$${(item.price || item.precio || 0).toFixed(2)}</td>
+                <td>${item.quantity || 1}</td>
+                <td>$${((item.subtotal != null ? Number(item.subtotal) : Number(item.price || item.precio || 0) * Number(item.quantity || 1))).toFixed(2)}</td>
             </tr>
         `).join('');
 
@@ -602,10 +676,10 @@ class FacturacionManager {
                         </div>
                         <div class="client-info">
                             <h3>Información del Cliente</h3>
-                            <p><strong>${sale.client.name}</strong></p>
-                            <p>${sale.client.city}</p>
-                            ${sale.client.phone ? `<p>Tel: ${sale.client.phone}</p>` : ''}
-                            ${sale.client.address ? `<p>${sale.client.address}</p>` : ''}
+                            <p><strong>${(sale.client?.nombre || sale.client?.name) ?? ''}</strong></p>
+                            <p>${(sale.client?.ciudad || sale.client?.city) ?? ''}</p>
+                            ${(sale.client?.telefono || sale.client?.phone) ? `<p>Tel: ${(sale.client.telefono || sale.client.phone)}</p>` : ''}
+                            ${(sale.client?.direccion || sale.client?.address) ? `<p>${(sale.client.direccion || sale.client.address)}</p>` : ''}
                         </div>
                     </div>
                     
@@ -621,8 +695,8 @@ class FacturacionManager {
                             ${sale.items.map(item => `
                                 <tr>
                                     <td>${item.description}</td>
-                                    <td>${item.category || 'General'}</td>
-                                    <td>$${item.price.toFixed(2)}</td>
+                                    <td>${item.quantity || 1}</td>
+                                    <td>$${(item.subtotal || 0).toFixed(2)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -681,7 +755,7 @@ class FacturacionManager {
                     ${this.filteredSales.map(sale => `
                         <div class="sale">
                             <div class="sale-header">
-                                Funda ${sale.funda} - ${sale.client.name} (${sale.client.city}) - ${new Date(sale.date).toLocaleDateString('es-EC')}
+                                Funda ${sale.funda} - ${(sale.client?.nombre || sale.client?.name) ?? ''} (${(sale.client?.ciudad || sale.client?.city) ?? ''}) - ${new Date(sale.date).toLocaleDateString('es-EC')}
                             </div>
                             <div class="items">
                                 ${sale.items.map(item => `${item.description} - $${item.price.toFixed(2)}`).join('<br>')}
@@ -706,14 +780,14 @@ class FacturacionManager {
                 },
                 sales: this.filteredSales.map(sale => ({
                     funda: sale.funda,
-                    cliente: sale.client.name,
-                    ciudad: sale.client.city,
+                    cliente: sale.client?.nombre || sale.client?.name,
+                    ciudad: sale.client?.ciudad || sale.client?.city,
                     fecha: new Date(sale.date).toLocaleDateString('es-EC'),
                     hora: new Date(sale.date).toLocaleTimeString('es-EC'),
                     articulos: sale.items.map(item => ({
-                        descripcion: item.description,
-                        categoria: item.category || 'General',
-                        precio: item.price
+                        nombre: item.description,
+                        cantidad: item.quantity || 1,
+                        subtotal: item.subtotal || 0
                     })),
                     total: sale.total
                 }))
@@ -814,6 +888,14 @@ class FacturacionManager {
         if (window.tiendaApp) {
             window.tiendaApp.showNotification(message, type);
         }
+    }
+
+    getDateKey(date) {
+        const d = new Date(date);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
     }
 }
 
