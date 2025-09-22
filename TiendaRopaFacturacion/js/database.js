@@ -647,7 +647,7 @@ class DatabaseManager {
         const ropa = this.getTable('ropa');
         
         return ventas.map(venta => {
-            const factura = facturas.find(f => f.idVentasRopa === venta.id);
+            const factura = facturas.find(f => Array.isArray(f.idVentasRopa) ? f.idVentasRopa.includes(venta.id) : f.idVentasRopa === venta.id);
             const cliente = clientes.find(c => c.cedula === venta.idCliente);
             const producto = ropa.find(r => r.id === venta.idRopa);
             
@@ -670,7 +670,7 @@ class DatabaseManager {
         const chucherias = this.getTable('chucherias');
         
         return ventas.map(venta => {
-            const factura = facturas.find(f => f.idVentasChucheria === venta.id);
+            const factura = facturas.find(f => Array.isArray(f.idVentasChucheria) ? f.idVentasChucheria.includes(venta.id) : f.idVentasChucheria === venta.id);
             const cliente = clientes.find(c => c.cedula === venta.idCliente);
             const producto = chucherias.find(ch => ch.id === venta.idChucherias);
             

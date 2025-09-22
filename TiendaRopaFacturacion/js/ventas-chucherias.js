@@ -277,9 +277,9 @@ class VentasChucheriasManager {
                 ventasIds.push(venta.id);
             });
 
-            // Crear factura
+            // Crear factura con todos los IDs de ventas
             const facturaData = {
-                idVentasChucheria: ventasIds[0], // Usar la primera venta como referencia
+                idVentasChucheria: ventasIds,
                 subtotal: this.currentSale.total,
                 total: this.currentSale.total
             };
@@ -390,7 +390,7 @@ class VentasChucheriasManager {
         const chucherias = window.database.getTable('chucherias');
 
         return facturas.map(factura => {
-            const ventasFactura = ventas.filter(v => v.id === factura.idVentasChucheria);
+            const ventasFactura = ventas.filter(v => Array.isArray(factura.idVentasChucheria) ? factura.idVentasChucheria.includes(v.id) : v.id === factura.idVentasChucheria);
             const cliente = clientes.find(c => c.cedula === ventasFactura[0]?.idCliente);
             const articulos = ventasFactura.map(v => {
                 const producto = chucherias.find(ch => ch.id === v.idChucherias);

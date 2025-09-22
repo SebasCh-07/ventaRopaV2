@@ -277,9 +277,9 @@ class VentasRopaManager {
                 ventasIds.push(venta.id);
             });
 
-            // Crear factura
+            // Crear factura con todos los IDs de ventas
             const facturaData = {
-                idVentasRopa: ventasIds[0], // Usar la primera venta como referencia
+                idVentasRopa: ventasIds,
                 subtotal: this.currentSale.total,
                 total: this.currentSale.total
             };
@@ -390,7 +390,7 @@ class VentasRopaManager {
         const ropa = window.database.getTable('ropa');
 
         return facturas.map(factura => {
-            const ventasFactura = ventas.filter(v => v.id === factura.idVentasRopa);
+            const ventasFactura = ventas.filter(v => Array.isArray(factura.idVentasRopa) ? factura.idVentasRopa.includes(v.id) : v.id === factura.idVentasRopa);
             const cliente = clientes.find(c => c.cedula === ventasFactura[0]?.idCliente);
             const articulos = ventasFactura.map(v => {
                 const producto = ropa.find(r => r.id === v.idRopa);
