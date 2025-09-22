@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Ropa - Sistema de Gestión</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="img/logo.jpg" alt="Logo Tienda de Ropa" class="logo-img">
+                <h1>DE MODA CON VIVI</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link active">Inicio</a>
+                <a href="clientes.html" class="nav-link">Clientes</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Ventas</a>
+                    <div class="dropdown-menu">
+                        <a href="ventas-ropa.html" class="dropdown-item">
+                            <span class="dropdown-icon">👗</span>
+                            Ropa
+                        </a>
+                        <a href="ventas-chucherias.html" class="dropdown-item">
+                            <span class="dropdown-icon">🍭</span>
+                            Chucherías
+                        </a>
+                    </div>
+                </div>
+                <a href="facturacion.html" class="nav-link">Facturación</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Header Section with Logo and Title -->
+            <section class="main-header-section">
+                <div class="header-content">
+                    <div class="left-title">
+                        <h1>VENTA DE ROPA</h1>
+                    </div>
+                    <div class="center-logo">
+                        <img src="img/logo.jpg" alt="Logo Tienda de Ropa" class="main-logo">
+                    </div>
+                    <div class="right-title">
+                        <h2>DE MODA CON VIVI</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Action Cards -->
+            <section class="main-actions-section">
+                <div class="actions-container">
+                    <!-- Clientes Card -->
+                    <div class="action-card" onclick="navigateTo('clientes.html')">
+                        <div class="action-image-box">
+                            <div class="action-emoji">👥</div>
+                        </div>
+                        <div class="action-text-box">
+                            <h3>INGRESAR CLIENTE</h3>
+                            <p class="action-description">Registra nuevos clientes y mantén actualizada tu base de datos</p>
+                        </div>
+                    </div>
+
+                    <!-- Ventas Container -->
+                    <div class="ventas-container">
+                        <div class="ventas-header">
+                            <h3>VENTAS</h3>
+                        </div>
+                        <div class="ventas-buttons">
+                            <!-- Ventas Ropa Card -->
+                            <div class="ventas-card" onclick="navigateTo('ventas-ropa.html')">
+                                <div class="ventas-emoji">👗</div>
+                                <div class="ventas-text">
+                                    <h4>ROPA</h4>
+                                    <p>Prendas y accesorios</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Ventas Chucherías Card -->
+                            <div class="ventas-card" onclick="navigateTo('ventas-chucherias.html')">
+                                <div class="ventas-emoji">🍭</div>
+                                <div class="ventas-text">
+                                    <h4>CHUCHERÍAS</h4>
+                                    <p>Dulces y snacks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facturación Card -->
+                    <div class="action-card" onclick="navigateTo('facturacion.html')">
+                        <div class="action-image-box">
+                            <div class="action-emoji">📋</div>
+                        </div>
+                        <div class="action-text-box">
+                            <h3>FACTURA</h3>
+                            <p class="action-description">Genera facturas, imprime recibos y exporta reportes</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Stats Section -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h4>Ventas del Mes</h4>
+                            <p class="stat-number" id="monthly-sales">$0.00</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <h4>Artículos Vendidos</h4>
+                            <p class="stat-number" id="items-sold">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <h4>Mejor Cliente</h4>
+                            <p class="stat-number" id="top-client">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <h4>Promedio por Venta</h4>
+                            <p class="stat-number" id="avg-sale">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <h3>Actividad Reciente</h3>
+                <div class="activity-list" id="recent-activity">
+                    <div class="activity-item">
+                        <div class="activity-icon">ℹ️</div>
+                        <div class="activity-content">
+                            <p>Bienvenido al sistema. Comienza agregando clientes y registrando ventas.</p>
+                            <span class="activity-time">Ahora</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Tienda de Ropa - Sistema de Gestión. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/database.js?v=4"></script>
+    <script src="js/dropdown.js?v=4"></script>
+    <script src="js/index.js?v=4"></script>
+</body>
+</html>
+

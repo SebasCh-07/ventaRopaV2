@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Tienda de Ropa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="img/logo.jpg" alt="Logo Tienda de Ropa" class="logo-img">
+                <h1>DE MODA CON VIVI</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="clientes.html" class="nav-link active">Clientes</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Ventas</a>
+                    <div class="dropdown-menu">
+                        <a href="ventas-ropa.html" class="dropdown-item">
+                            <span class="dropdown-icon">👗</span>
+                            Ropa
+                        </a>
+                        <a href="ventas-chucherias.html" class="dropdown-item">
+                            <span class="dropdown-icon">🍭</span>
+                            Chucherías
+                        </a>
+                    </div>
+                </div>
+                <a href="facturacion.html" class="nav-link">Facturación</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>👥 Gestión de Clientes</h2>
+                    <p>Administra tu base de clientes y mantén la información actualizada</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-primary" id="add-client-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Agregar Cliente
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="filters-section">
+                <div class="search-box">
+                    <input type="text" id="client-search" placeholder="Buscar clientes por nombre, ciudad, teléfono..." onkeyup="searchClients()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </div>
+                <div class="filter-controls">
+                    <select id="city-filter" onchange="filterByCity()">
+                        <option value="">Todas las ciudades</option>
+                    </select>
+                    <button class="btn btn-secondary" id="clear-filters-btn">Limpiar Filtros</button>
+                </div>
+            </div>
+
+            <!-- Clients Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Lista de Clientes</h3>
+                    <div class="table-info">
+                        <span id="clients-count">0 clientes</span>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="clients-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('name')">
+                                    NOMBRE
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </th>
+                                <th onclick="sortTable('city')">
+                                    CIUDAD
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </th>
+                                <th onclick="sortTable('phone')">
+                                    TELEFONO
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </th>
+                                <th onclick="sortTable('cedula')">
+                                    CEDULA
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </th>
+                                <th onclick="sortTable('address')">
+                                    DIRECCION
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </th>
+                                <th onclick="sortTable('observacion')">
+                                    OBSERVACION
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-table-body">
+                            <!-- Los clientes se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">👥</div>
+                <h3>No hay clientes registrados</h3>
+                <p>Comienza agregando tu primer cliente para gestionar tu base de datos</p>
+                <button class="btn btn-primary" onclick="showAddClientModal()">Agregar Primer Cliente</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Client Modal -->
+    <div id="add-client-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Nuevo Cliente</h3>
+                <button class="modal-close" onclick="hideAddClientModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="add-client-form" onsubmit="clientesManager.addClient(event)">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-name">Nombre Completo *</label>
+                            <input type="text" id="client-name" name="nombre" required placeholder="Ej: María González">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-city">Ciudad *</label>
+                            <input type="text" id="client-city" name="ciudad" required placeholder="Ej: Quito">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-phone">Teléfono</label>
+                            <input type="tel" id="client-phone" name="telefono" placeholder="Ej: 0987654321">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-cedula">Cédula</label>
+                            <input type="text" id="client-cedula" name="cedula" placeholder="Ej: 1234567890">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="client-address">Dirección</label>
+                        <input type="text" id="client-address" name="direccion" placeholder="Ej: Av. Amazonas 123">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-observacion">Observación</label>
+                        <textarea id="client-observacion" name="observacion" placeholder="Notas adicionales sobre el cliente" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="clientesManager.closeModal('add-client-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Client Modal -->
+    <div id="edit-client-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Cliente</h3>
+                <button class="modal-close" onclick="hideEditClientModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="edit-client-form" onsubmit="clientesManager.updateClient(event)">
+                <input type="hidden" id="edit-client-cedula" name="cedula">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-client-name">Nombre Completo *</label>
+                            <input type="text" id="edit-client-name" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-client-city">Ciudad *</label>
+                            <input type="text" id="edit-client-city" name="ciudad" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-client-phone">Teléfono</label>
+                            <input type="tel" id="edit-client-phone" name="telefono">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-client-cedula">Cédula</label>
+                            <input type="text" id="edit-client-cedula-display" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-client-address">Dirección</label>
+                        <input type="text" id="edit-client-address" name="direccion">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-client-observacion">Observación</label>
+                        <textarea id="edit-client-observacion" name="observacion" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="clientesManager.closeModal('edit-client-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-client-modal" class="modal" style="display: none;">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3>Confirmar Eliminación</h3>
+                <button class="modal-close" onclick="clientesManager.closeModal('delete-client-modal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="clientesManager.deleteClient(event)">
+                <input type="hidden" id="delete-client-cedula" name="cedula">
+                <div class="modal-body">
+                    <p>¿Estás seguro de que quieres eliminar el cliente <strong id="delete-client-name"></strong>?</p>
+                    <p class="warning-text">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="clientesManager.closeModal('delete-client-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/database.js?v=4"></script>
+    <script src="js/dropdown.js?v=4"></script>
+    <script src="js/clientes.js?v=4"></script>
+</body>
+</html>
+

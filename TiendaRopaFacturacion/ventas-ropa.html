@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas de Ropa - DE MODA CON VIVI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="img/logo.jpg" alt="Logo Tienda de Ropa" class="logo-img">
+                <h1>DE MODA CON VIVI</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="clientes.html" class="nav-link">Clientes</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Ventas</a>
+                    <div class="dropdown-menu">
+                        <a href="ventas-ropa.html" class="dropdown-item active">
+                            <span class="dropdown-icon">👗</span>
+                            Ropa
+                        </a>
+                        <a href="ventas-chucherias.html" class="dropdown-item">
+                            <span class="dropdown-icon">🍭</span>
+                            Chucherías
+                        </a>
+                    </div>
+                </div>
+                <a href="facturacion.html" class="nav-link">Facturación</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>👗 Ventas de Ropa</h2>
+                    <p>Gestiona las ventas de ropa con categorías específicas y control de inventario</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-primary" id="new-sale-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Nueva Venta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Sale Display -->
+            <div class="current-sale-section">
+                <div class="sale-info">
+                    <div id="current-client" class="sale-client">
+                        <span class="text-muted">No hay cliente seleccionado</span>
+                    </div>
+                    <div class="sale-actions">
+                        <button class="btn btn-success" id="add-item-btn" disabled>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Agregar Artículo
+                        </button>
+                        <button class="btn btn-primary" id="finalize-sale-btn" disabled>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4"></path>
+                                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                            </svg>
+                            Finalizar Venta
+                        </button>
+                    </div>
+                </div>
+                <div class="sale-items">
+                    <h4>Artículos en la Venta</h4>
+                    <div id="current-items" class="items-list">
+                        <p class="text-muted">No hay artículos en la venta</p>
+                    </div>
+                    <div class="sale-total">
+                        <strong>Total: $<span id="current-total">0.00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Historial de Ventas</h3>
+                    <div class="table-info">
+                        <span id="sales-count">0 ventas</span>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="sales-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Funda</th>
+                                <th>Cliente</th>
+                                <th>Ciudad</th>
+                                <th>Fecha</th>
+                                <th>Artículos</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-table-body">
+                            <!-- Las ventas se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">👗</div>
+                <h3>No hay ventas registradas</h3>
+                <p>Comienza creando tu primera venta de ropa</p>
+                <button class="btn btn-primary" id="new-sale-btn-empty">Nueva Venta</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Sale Modal -->
+    <div id="add-sale-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nueva Venta de Ropa</h3>
+                <button class="modal-close" onclick="ventasRopaManager.closeModal('add-sale-modal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="add-sale-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="sale-client">Seleccionar Cliente *</label>
+                        <select id="sale-client" name="client" required>
+                            <option value="">Seleccionar cliente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="ventasRopaManager.closeModal('add-sale-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Continuar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Articles Modal -->
+    <div id="articulos-modal" class="modal large" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Seleccionar Artículos de Ropa</h3>
+                <button class="modal-close" onclick="ventasRopaManager.closeModal('articulos-modal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="categories-section">
+                    <h4>Categorías</h4>
+                    <div id="categories-container" class="categories-grid">
+                        <!-- Las categorías se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+                <div class="products-section">
+                    <h4>Productos</h4>
+                    <div id="products-container" class="products-grid">
+                        <p class="text-muted">Seleccione una categoría para ver los productos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Articles Modal -->
+    <div id="view-articles-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalle de Artículos</h3>
+                <button class="modal-close" onclick="ventasRopaManager.closeModal('view-articles-modal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="invoice-info">
+                    <div class="invoice-header">
+                        <h4 id="invoice-funda">Funda 0</h4>
+                        <div class="invoice-details">
+                            <p><strong>Cliente:</strong> <span id="invoice-client-name">-</span></p>
+                            <p><strong>Ciudad:</strong> <span id="invoice-client-city">-</span></p>
+                            <p><strong>Fecha:</strong> <span id="invoice-date">-</span></p>
+                            <p><strong>Total:</strong> <span id="invoice-total">$0.00</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="invoice-items">
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-items-tbody">
+                            <!-- Los artículos se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/database.js?v=4"></script>
+    <script src="js/dropdown.js?v=4"></script>
+    <script src="js/ventas-ropa.js?v=4"></script>
+</body>
+</html>

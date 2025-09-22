@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 Forzar Actualización - DE MODA CON VIVI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .steps {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        .links {
+            margin-top: 30px;
+        }
+        .link {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Forzar Actualización del Caché</h1>
+        
+        <div class="warning">
+            <h3>⚠️ Problema Detectado</h3>
+            <p>El navegador está intentando acceder a <code>ventas.html</code> que ya no existe. 
+            Esto es causado por el caché del navegador que contiene versiones antiguas de los archivos JavaScript.</p>
+        </div>
+
+        <div class="steps">
+            <h3>🔧 Solución Paso a Paso:</h3>
+            
+            <div class="step">
+                <strong>Paso 1:</strong> Presiona <kbd>Ctrl + F5</kbd> o <kbd>Ctrl + Shift + R</kbd> para forzar la recarga
+            </div>
+            
+            <div class="step">
+                <strong>Paso 2:</strong> Si persiste el error, abre las Herramientas de Desarrollador (<kbd>F12</kbd>)
+            </div>
+            
+            <div class="step">
+                <strong>Paso 3:</strong> Clic derecho en el botón de recarga (🔄) y selecciona "Vaciar caché y recargar forzadamente"
+            </div>
+            
+            <div class="step">
+                <strong>Paso 4:</strong> Alternativamente, abre una ventana de incógnito (<kbd>Ctrl + Shift + N</kbd>)
+            </div>
+        </div>
+
+        <div class="success" id="success-message">
+            <h3>✅ ¡Problema Resuelto!</h3>
+            <p>El caché ha sido limpiado correctamente. Ahora puedes navegar normalmente.</p>
+        </div>
+
+        <div>
+            <button class="btn" onclick="forceRefresh()">🔄 Forzar Recarga</button>
+            <button class="btn btn-danger" onclick="clearCache()">🧹 Limpiar Caché</button>
+        </div>
+
+        <div class="links">
+            <h3>🔗 Enlaces Directos (Actualizados):</h3>
+            <a href="index.html" class="link">🏠 Dashboard</a>
+            <a href="clientes.html" class="link">👥 Clientes</a>
+            <a href="ventas-ropa.html" class="link">👗 Ventas Ropa</a>
+            <a href="ventas-chucherias.html" class="link">🍭 Ventas Chucherías</a>
+            <a href="facturacion.html" class="link">📋 Facturación</a>
+        </div>
+
+        <div style="margin-top: 30px; font-size: 14px; opacity: 0.8;">
+            <p><strong>Nota:</strong> Los archivos han sido renombrados de <code>ventas.html</code> a <code>ventas-ropa.html</code> y <code>ventas-chucherias.html</code></p>
+        </div>
+    </div>
+
+    <script>
+        function forceRefresh() {
+            // Forzar recarga sin caché
+            window.location.reload(true);
+        }
+
+        function clearCache() {
+            // Intentar limpiar caché programáticamente
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            
+            // Mostrar mensaje de éxito
+            document.getElementById('success-message').style.display = 'block';
+            
+            // Recargar después de 2 segundos
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 2000);
+        }
+
+        // Detectar si hay errores en la consola
+        window.addEventListener('error', function(e) {
+            if (e.message.includes('ventas.html')) {
+                console.warn('⚠️ Error detectado: El navegador está intentando acceder a ventas.html (archivo obsoleto)');
+                console.log('💡 Solución: Presiona Ctrl + F5 para forzar la recarga');
+            }
+        });
+
+        // Mostrar instrucciones en la consola
+        console.log('🔄 Página de forzar actualización cargada');
+        console.log('💡 Si ves errores de ventas.html, presiona Ctrl + F5');
+        console.log('🔗 Enlaces actualizados: ventas-ropa.html y ventas-chucherias.html');
+    </script>
+</body>
+</html>

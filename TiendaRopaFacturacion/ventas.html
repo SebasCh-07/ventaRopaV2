@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirección - DE MODA CON VIVI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffc107;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Redirección Automática</h1>
+        
+        <div class="info">
+            <h3>📝 Archivo Renombrado</h3>
+            <p>El archivo <code>ventas.html</code> ha sido renombrado para mejor organización:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li><strong>ventas-ropa.html</strong> - Para ventas de ropa</li>
+                <li><strong>ventas-chucherias.html</strong> - Para ventas de chucherías</li>
+            </ul>
+        </div>
+
+        <div class="countdown" id="countdown">
+            Redirigiendo en <span id="timer">5</span> segundos...
+        </div>
+
+        <div>
+            <a href="ventas-ropa.html" class="btn">👗 Ir a Ventas de Ropa</a>
+            <a href="ventas-chucherias.html" class="btn">🍭 Ir a Ventas de Chucherías</a>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="btn btn-secondary">🏠 Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tipo = urlParams.get('tipo');
+        
+        // Determinar a dónde redirigir
+        let redirectUrl = 'ventas-ropa.html'; // Por defecto
+        
+        if (tipo === 'chucherias') {
+            redirectUrl = 'ventas-chucherias.html';
+        } else if (tipo === 'ropa') {
+            redirectUrl = 'ventas-ropa.html';
+        }
+        
+        // Contador regresivo
+        let seconds = 5;
+        const timerElement = document.getElementById('timer');
+        const countdownElement = document.getElementById('countdown');
+        
+        const countdown = setInterval(() => {
+            seconds--;
+            timerElement.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                countdownElement.innerHTML = '🔄 Redirigiendo...';
+                window.location.href = redirectUrl;
+            }
+        }, 1000);
+        
+        // Redirigir inmediatamente si se hace clic en los botones
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                clearInterval(countdown);
+            });
+        });
+        
+        // Mostrar información en la consola
+        console.log('🔄 Página de redirección cargada');
+        console.log('📝 ventas.html ha sido renombrado');
+        console.log('🔗 Redirigiendo a:', redirectUrl);
+        console.log('💡 Enlaces actualizados: ventas-ropa.html y ventas-chucherias.html');
+    </script>
+</body>
+</html>

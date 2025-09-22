@@ -1,0 +1,50 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="DE MODA CON VIVI - Tablas" id="de-moda-vivi">
+    <mxGraphModel dx="1390" dy="827" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- CLIENTES -->
+        <mxCell id="clientes" value="CLIENTES&#xa;---&#xa;id (PK)&#xa;nombre&#xa;ciudad&#xa;telefono&#xa;direccion&#xa;email&#xa;created_at&#xa;updated_at" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="180" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- PRODUCTOS -->
+        <mxCell id="productos" value="PRODUCTOS&#xa;---&#xa;id (PK)&#xa;nombre&#xa;precio&#xa;categoria_id (FK)&#xa;tipo_producto&#xa;created_at&#xa;updated_at" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="200" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- CATEGORIAS -->
+        <mxCell id="categorias" value="CATEGORIAS&#xa;---&#xa;id (PK)&#xa;nombre&#xa;tipo_producto" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="180" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- VENTAS -->
+        <mxCell id="ventas" value="VENTAS&#xa;---&#xa;id (PK)&#xa;funda&#xa;cliente_id (FK)&#xa;total&#xa;fecha&#xa;tipo_producto&#xa;created_at" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="200" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- VENTA_DETALLES -->
+        <mxCell id="venta_detalles" value="VENTA_DETALLES&#xa;---&#xa;id (PK)&#xa;venta_id (FK)&#xa;producto_id (FK)&#xa;cantidad&#xa;precio_unitario&#xa;subtotal" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="300" width="200" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- Relaciones -->
+        <mxCell id="rel1" edge="1" parent="1" source="clientes" target="ventas">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel2" edge="1" parent="1" source="ventas" target="venta_detalles">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel3" edge="1" parent="1" source="productos" target="venta_detalles">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel4" edge="1" parent="1" source="categorias" target="productos">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

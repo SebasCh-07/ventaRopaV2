@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturación - Tienda de Ropa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="img/logo.jpg" alt="Logo Tienda de Ropa" class="logo-img">
+                <h1>DE MODA CON VIVI</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="clientes.html" class="nav-link">Clientes</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Ventas</a>
+                    <div class="dropdown-menu">
+                        <a href="ventas-ropa.html" class="dropdown-item">
+                            <span class="dropdown-icon">👗</span>
+                            Ropa
+                        </a>
+                        <a href="ventas-chucherias.html" class="dropdown-item">
+                            <span class="dropdown-icon">🍭</span>
+                            Chucherías
+                        </a>
+                    </div>
+                </div>
+                <a href="facturacion.html" class="nav-link active">Facturación</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>📋 Sistema de Facturación</h2>
+                    <p>Revisa, imprime y exporta facturas de todas las ventas realizadas</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-success" onclick="exportAllData()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Exportar Todo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-content">
+                        <h4>Total Ventas</h4>
+                        <p class="card-number" id="total-sales">0</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">💰</div>
+                    <div class="card-content">
+                        <h4>Ingresos Totales</h4>
+                        <p class="card-number" id="total-revenue">$0.00</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">📦</div>
+                    <div class="card-content">
+                        <h4>Artículos Vendidos</h4>
+                        <p class="card-number" id="total-items">0</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">👥</div>
+                    <div class="card-content">
+                        <h4>Clientes Únicos</h4>
+                        <p class="card-number" id="unique-clients">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label for="date-from">Desde:</label>
+                    <input type="date" id="date-from" onchange="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label for="date-to">Hasta:</label>
+                    <input type="date" id="date-to" onchange="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label for="funda-filter">Funda:</label>
+                    <select id="funda-filter" onchange="applyFilters()">
+                        <option value="">Todas las fundas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="client-filter">Cliente:</label>
+                    <select id="client-filter" onchange="applyFilters()">
+                        <option value="">Todos los clientes</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button>
+                    <button class="btn btn-primary" onclick="applyFilters()">Filtrar</button>
+                </div>
+            </div>
+
+            <!-- Sales List -->
+            <div class="sales-list-container">
+                <div class="list-header">
+                    <h3>Facturas Registradas</h3>
+                    <div class="list-actions">
+                        <button class="btn btn-secondary" onclick="printAllSales()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 6,2 18,2 18,9"></polyline>
+                                <path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"></path>
+                                <polyline points="6,14 18,14 18,18 6,18"></polyline>
+                            </svg>
+                            Imprimir Todo
+                        </button>
+                    </div>
+                </div>
+                <div id="sales-list" class="sales-list">
+                    <!-- Las facturas se mostrarán aquí -->
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">📋</div>
+                <h3>No hay facturas registradas</h3>
+                <p>Comienza registrando ventas para generar facturas automáticamente</p>
+                <button class="btn btn-primary" onclick="navigateTo('ventas-ropa.html')">Ir a Ventas</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Invoice Detail Modal -->
+    <div id="invoice-modal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Detalle de Factura</h3>
+                <button class="modal-close" onclick="hideInvoiceModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="invoice-detail">
+                    <div class="invoice-header">
+                        <div class="invoice-info">
+                            <h4>TIENDA DE ROPA</h4>
+                            <p>Sistema de Gestión de Ventas</p>
+                        </div>
+                        <div class="invoice-number">
+                            <h2>FUNDA <span id="invoice-funda"></span></h2>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-client">
+                        <h4>Información del Cliente</h4>
+                        <div class="client-details">
+                            <p><strong>Nombre:</strong> <span id="invoice-client-name"></span></p>
+                            <p><strong>Ciudad:</strong> <span id="invoice-client-city"></span></p>
+                            <p><strong>Teléfono:</strong> <span id="invoice-client-phone"></span></p>
+                            <p><strong>Fecha:</strong> <span id="invoice-date"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-items">
+                        <h4>Artículos Vendidos</h4>
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-items-tbody">
+                                <!-- Los artículos se mostrarán aquí -->
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="2"><strong>TOTAL</strong></td>
+                                    <td><strong>$<span id="invoice-total"></span></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideInvoiceModal()">Cerrar</button>
+                <button class="btn btn-primary" onclick="printInvoice()">Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Modal -->
+    <div id="bulk-actions-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Acciones Masivas</h3>
+                <button class="modal-close" onclick="hideBulkActionsModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Selecciona las acciones que deseas realizar:</p>
+                <div class="bulk-actions">
+                    <button class="btn btn-primary" onclick="exportSelectedSales()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Exportar Seleccionadas
+                    </button>
+                    <button class="btn btn-secondary" onclick="printSelectedSales()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 6,2 18,2 18,9"></polyline>
+                            <path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"></path>
+                            <polyline points="6,14 18,14 18,18 6,18"></polyline>
+                        </svg>
+                        Imprimir Seleccionadas
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSelectedSales()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                        </svg>
+                        Eliminar Seleccionadas
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideBulkActionsModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/database.js?v=4"></script>
+    <script src="js/dropdown.js?v=4"></script>
+    <script src="js/facturacion.js?v=4"></script>
+</body>
+</html>
+
