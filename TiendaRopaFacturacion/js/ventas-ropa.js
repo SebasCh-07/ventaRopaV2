@@ -310,6 +310,18 @@ class VentasRopaManager {
         this.updateClientDisplay();
         this.updateItemsDisplay();
         this.updateTotalDisplay();
+        this.updateActionButtons();
+    }
+
+    updateActionButtons() {
+        const addItemBtn = document.getElementById('add-item-btn');
+        const finalizeBtn = document.getElementById('finalize-sale-btn');
+        if (addItemBtn) {
+            addItemBtn.disabled = !this.currentSale.cliente;
+        }
+        if (finalizeBtn) {
+            finalizeBtn.disabled = !(this.currentSale.cliente && this.currentSale.articulos.length > 0);
+        }
     }
 
     updateClientDisplay() {

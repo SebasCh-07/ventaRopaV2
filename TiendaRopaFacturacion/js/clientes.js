@@ -176,7 +176,7 @@ class ClientesManager {
             <td>${this.escapeHtml(client.observacion || '-')}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-primary" onclick="clientesManager.editClient(${client.cedula})" title="Editar">
+                    <button class="btn btn-sm btn-primary" onclick="clientesManager.showEditClientModal(${client.cedula})" title="Editar">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -214,10 +214,10 @@ class ClientesManager {
             // Llenar formulario con datos del cliente
             document.getElementById('edit-client-cedula').value = client.cedula;
             document.getElementById('edit-client-cedula-display').value = client.cedula;
-            document.getElementById('edit-client-nombre').value = client.nombre;
-            document.getElementById('edit-client-ciudad').value = client.ciudad;
-            document.getElementById('edit-client-telefono').value = client.telefono || '';
-            document.getElementById('edit-client-direccion').value = client.direccion || '';
+            document.getElementById('edit-client-name').value = client.nombre;
+            document.getElementById('edit-client-city').value = client.ciudad;
+            document.getElementById('edit-client-phone').value = client.telefono || '';
+            document.getElementById('edit-client-address').value = client.direccion || '';
             document.getElementById('edit-client-observacion').value = client.observacion || '';
             
             modal.style.display = 'flex';
